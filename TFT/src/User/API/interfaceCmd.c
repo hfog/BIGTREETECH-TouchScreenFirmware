@@ -151,6 +151,31 @@ void sendQueueCmd(void)
   
   bool avoid_terminal = false;
   u16  cmd=0;
+
+// look for M117 commands even when they are couched behind N commands (line numbers)
+  if (cmd_seen('M')) 
+  {
+    if (cmd_value() == 117)
+    {
+         char message[CMD_MAX_CHAR];
+         strncpy(message, &infoCmd.queue[infoCmd.index_r].gcode[cmd_index + 4], CMD_MAX_CHAR);
+         // strip out any checksum that might be in the string
+         for (int i = 0; i < CMD_MAX_CHAR && message[i] !=0 ; i++)
+         {
+           if (message[i] == '*')
+           {
+             message[i] = 0;
+             break;
+           }
+         }
+         statusScreen_setMsg((u8 *)"M117", (u8 *)&message);
+          if (infoMenu.menu[infoMenu.cur] != menuStatus)
+          {
+            popupReminder((u8 *)"M117", (u8 *)&message);
+          }
+    }
+  }
+
   switch(infoCmd.queue[infoCmd.index_r].gcode[0])
   {
     case 'M':
@@ -259,7 +284,7 @@ void sendQueueCmd(void)
             positionSetUpdateWaiting(false);
           #endif
           break;
-
+#if 0
         case 117: //M117
           statusScreen_setMsg((u8 *)"M117", (u8 *)&infoCmd.queue[infoCmd.index_r].gcode[5]);
           if (infoMenu.menu[infoMenu.cur] != menuStatus)
@@ -267,6 +292,7 @@ void sendQueueCmd(void)
             popupReminder((u8 *)"M117", (u8 *)&infoCmd.queue[infoCmd.index_r].gcode[5]);
           }
           break;
+#endif
         case 190: //M190
           infoCmd.queue[infoCmd.index_r].gcode[2]='4';
           heatSetIsWaiting(BED,true);											

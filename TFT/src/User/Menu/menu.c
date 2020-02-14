@@ -269,7 +269,10 @@ void menuDrawPage(const MENUITEMS *menuItems)
   {
     menuDrawItem(&menuItems->items[i], i);
     #ifdef RAPID_SERIAL_COMM
-      if(isPrinting() == true){
+      #ifndef CLEAN_MODE_SWITCHING_SUPPORT
+        if(isPrinting() == true)
+      #endif
+      {
         loopBackEnd();	 //perform backend printing loop between drawing icons to avoid printer idling
       }
     #endif

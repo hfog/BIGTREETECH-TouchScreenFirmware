@@ -18,13 +18,13 @@ GUI_RECT doubleBtnRect[] ={POPUP_RECT_DOUBLE_CONFIRM, POPUP_RECT_DOUBLE_CANCEL};
 
 
 WINDOW window = {
-  POPUP_RECT_WINDOW,       //µ¯´°µÄÇøÓò
-  10,                      //ËÄ½ÇÔ²»¡µÄ°ë¾¶
-  3,                       //Íâ±ßµÄÏß¿í
-  0x5D7B,                  //Íâ±ßºÍ±êÌâÀ¸µÄ±³¾°É«
-  {MAGENTA, 0x5D7B, POPUP_TITLE_HEIGHT},   //±êÌâÀ¸ ×ÖÌåÉ«/±³¾°É«/¸ß¶È
-  {WHITE, BLACK, POPUP_TEXT_HEIGHT},    //ÎÄ±¾À¸ ×ÖÌåÉ«/±³¾°É«/¸ß¶È
-  {WHITE, GRAY,  POPUP_BOTTOM_HEIGHT},  //µ×²¿ (×ÖÌåÉ«)/±³¾°É«/(¸ß¶È)
+  POPUP_RECT_WINDOW,       //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+  10,                      //ï¿½Ä½ï¿½Ô²ï¿½ï¿½ï¿½Ä°ë¾¶
+  3,                       //ï¿½ï¿½ßµï¿½ï¿½ß¿ï¿½
+  0x5D7B,                  //ï¿½ï¿½ßºÍ±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½ï¿½ï¿½É«
+  {MAGENTA, 0x5D7B, POPUP_TITLE_HEIGHT},   //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½É«/ï¿½ï¿½ï¿½ï¿½É«/ï¿½ß¶ï¿½
+  {WHITE, BLACK, POPUP_TEXT_HEIGHT},    //ï¿½Ä±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½É«/ï¿½ï¿½ï¿½ï¿½É«/ï¿½ß¶ï¿½
+  {WHITE, GRAY,  POPUP_BOTTOM_HEIGHT},  //ï¿½×²ï¿½ (ï¿½ï¿½ï¿½ï¿½É«)/ï¿½ï¿½ï¿½ï¿½É«/(ï¿½ß¶ï¿½)
 };
 
 static BUTTON *windowButton =  NULL;
@@ -85,6 +85,9 @@ void menuPopup(void)
 
 void popupReminder(u8* info, u8* context)
 {
+  #ifdef CLEAN_MODE_SWITCHING_SUPPORT
+    if (infoSettings.mode == LCD12864) return;
+  #endif
   popupDrawPage(&bottomSingleBtn , info, context, textSelect(LABEL_CONFIRM), NULL);    
   if(infoMenu.menu[infoMenu.cur] != menuPopup)
   {

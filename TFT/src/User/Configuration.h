@@ -16,13 +16,13 @@
 // Marlin Mode Background & Font Color Options
 // Current color options from lcd.h: BLACK, BLUE, BROWN, BRRED, CYAN, GBLUE, GRAY, GREEN, MAGENTA, RED, WHITE, YELLOW
 #define ST7920_BKCOLOR BLACK
-#define ST7920_FNCOLOR GREEN
+#define ST7920_FNCOLOR YELLOW
 
 // Text displayed at the top of the LCD in Marlin Mode.
 //#define ST7920_BANNER_TEXT "LCD12864 Simulator"
 
 // Run Marlin Mode fullscreen. Not recommended for TFT24.
-//#define ST7920_FULLSCREEN
+#define ST7920_FULLSCREEN
 
 //===========================================================================
 //============================ TFT Mode Settings ============================
@@ -144,6 +144,10 @@
   #define M27_WATCH_OTHER_SOURCES    true     // if true the polling on M27 report is always active. Case: SD print started not from TFT35
 #endif
 
+// Support for clean mode switching
+// Gives the ability to connect Octoprint over UART and have it work seamlessly no matter which mode the TFT is in.
+#define CLEAN_MODE_SWITCHING_SUPPORT
+
 /**
  * Home before power loss recovery
  * Many printer will crash printed model when homing, which is not suitable for home before PLR.
@@ -175,7 +179,7 @@
   
   Note: this might make the  graphics slow when switching menus while printing.
 */
-//#define RAPID_SERIAL_COMM
+#define RAPID_SERIAL_COMM
 
 /**
  * Enable list mode in Custom G-Code menu
