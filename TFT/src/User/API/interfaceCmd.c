@@ -4,16 +4,15 @@
 
 QUEUE infoCmd;       //
 QUEUE infoCacheCmd;  // Only when heatHasWaiting() is false the cmd in this cache will move to infoCmd queue.
-char gcode[CMD_MAX_CHAR]; //temporary buffer so we can work with pure gcode during parsing
 
 static u8 cmd_index=0;
 
 // Is there a code character in the current gcode command.
 static bool cmd_seen(char code)
 {  
-  for(cmd_index = 0; gcode[cmd_index] != 0 && cmd_index < CMD_MAX_CHAR; cmd_index++)
+  for(cmd_index = 0; infoCmd.queue[infoCmd.index_r].gcode[cmd_index] != 0 && cmd_index < CMD_MAX_CHAR; cmd_index++)
   {
-    if(gcode[cmd_index] == code)
+    if(infoCmd.queue[infoCmd.index_r].gcode[cmd_index] == code)
     {
       cmd_index += 1;
       return true;
@@ -25,13 +24,13 @@ static bool cmd_seen(char code)
 // Get the int after 'code', Call after cmd_seen('code').
 static u32 cmd_value(void)
 {
-  return (strtol(&gcode[cmd_index], NULL, 10));
+  return (strtol(&infoCmd.queue[infoCmd.index_r].gcode[cmd_index], NULL, 10));
 }
 
 // Get the float after 'code', Call after cmd_seen('code').
 static float cmd_float(void)
 {
-  return (strtod(&gcode[cmd_index], NULL));
+  return (strtod(&infoCmd.queue[infoCmd.index_r].gcode[cmd_index], NULL));
 }
 
 // Store gcode cmd to infoCmd queue, this cmd will be sent by UART in sendQueueCmd(),
@@ -153,36 +152,34 @@ void sendQueueCmd(void)
   bool avoid_terminal = false;
   u16  cmd=0;
 
-  // copy the gcode into our local buffer, stripping out any linenumbers or checksums
-  if (infoCmd.queue[infoCmd.index_r].gcode[0] == 'N')
+// look for M117 commands even when they are couched behind N commands (line numbers)
+  if (cmd_seen('M')) 
   {
-    // this code starts with a line number (and likely ends with a checksum) so we need to strip it out
-    int i = 1;
-    // find the first space
-    while (i < CMD_MAX_CHAR && infoCmd.queue[infoCmd.index_r].gcode[i] != ' ') i++;
-    // then find the next non space
-    while (i < CMD_MAX_CHAR && infoCmd.queue[infoCmd.index_r].gcode[i] == ' ') i++;
-    // copy the rest
-    strncpy(gcode, &infoCmd.queue[infoCmd.index_r].gcode[i], CMD_MAX_CHAR);
-    // and strip out anything after the last '*', thereby removing the checksum
-    for (i = CMD_MAX_CHAR; i > 0; i--)
+    if (cmd_value() == 117)
     {
-      if (gcode[i] == '*')
-      {
-        gcode[i] = 0;
-        break;
-      }
+         char message[CMD_MAX_CHAR];
+         strncpy(message, &infoCmd.queue[infoCmd.index_r].gcode[cmd_index + 4], CMD_MAX_CHAR);
+         // strip out any checksum that might be in the string
+         for (int i = 0; i < CMD_MAX_CHAR && message[i] !=0 ; i++)
+         {
+           if (message[i] == '*')
+           {
+             message[i] = 0;
+             break;
+           }
+         }
+         statusScreen_setMsg((u8 *)"M117", (u8 *)&message);
+          if (infoMenu.menu[infoMenu.cur] != menuStatus)
+          {
+            popupReminder((u8 *)"M117", (u8 *)&message);
+          }
     }
   }
-  else
-  {
-    strncpy(gcode, infoCmd.queue[infoCmd.index_r].gcode, CMD_MAX_CHAR);
-  }
-  
-  switch(gcode[0])
+
+  switch(infoCmd.queue[infoCmd.index_r].gcode[0])
   {
     case 'M':
-      cmd=strtol(&gcode[1],NULL,10);
+      cmd=strtol(&infoCmd.queue[infoCmd.index_r].gcode[1],NULL,10);
       switch(cmd)
       {
         case 0:
@@ -228,7 +225,7 @@ void sendQueueCmd(void)
         {
           TOOL i = heatGetCurrentToolNozzle();
           if(cmd_seen('T')) i = (TOOL)(cmd_value() + NOZZLE0);
-          gcode[3]='4';
+          infoCmd.queue[infoCmd.index_r].gcode[3]='4';
           heatSetIsWaiting(i,true);
         }
         case 104: //M104
@@ -243,7 +240,7 @@ void sendQueueCmd(void)
           {
             char buf[12];
             sprintf(buf, "S%d\n", heatGetTargetTemp(i));
-            strcat(gcode,(const char*)buf);
+            strcat(infoCmd.queue[infoCmd.index_r].gcode,(const char*)buf);
             heatSetSendWaiting(i, false);
           }
           break;
@@ -268,7 +265,7 @@ void sendQueueCmd(void)
           {
             char buf[12];
             sprintf(buf, "S%d\n", fanGetSpeed(i));
-            strcat(gcode,(const char*)buf);
+            strcat(infoCmd.queue[infoCmd.index_r].gcode,(const char*)buf);
             fanSetSendWaiting(i, false);
           }
           break;
@@ -287,17 +284,17 @@ void sendQueueCmd(void)
             positionSetUpdateWaiting(false);
           #endif
           break;
-
+#if 0
         case 117: //M117
-          statusScreen_setMsg((u8 *)"M117", (u8 *)&gcode[5]);
+          statusScreen_setMsg((u8 *)"M117", (u8 *)&infoCmd.queue[infoCmd.index_r].gcode[5]);
           if (infoMenu.menu[infoMenu.cur] != menuStatus)
           {
-            popupReminder((u8 *)"M117", (u8 *)&gcode[5]);
+            popupReminder((u8 *)"M117", (u8 *)&infoCmd.queue[infoCmd.index_r].gcode[5]);
           }
           break;
-
+#endif
         case 190: //M190
-          gcode[2]='4';
+          infoCmd.queue[infoCmd.index_r].gcode[2]='4';
           heatSetIsWaiting(BED,true);											
         case 140: //M140
           if(cmd_seen('S'))
@@ -308,7 +305,7 @@ void sendQueueCmd(void)
           {
             char buf[12];
             sprintf(buf, "S%d\n", heatGetTargetTemp(BED));
-            strcat(gcode,(const char*)buf);
+            strcat(infoCmd.queue[infoCmd.index_r].gcode,(const char*)buf);
             heatSetSendWaiting(BED, false);
           }
           break;
@@ -322,7 +319,7 @@ void sendQueueCmd(void)
           {
             char buf[12];
             sprintf(buf, "S%d\n", speedGetPercent(0));
-            strcat(gcode,(const char*)buf);
+            strcat(infoCmd.queue[infoCmd.index_r].gcode,(const char*)buf);
             speedSetSendWaiting(0, false);
           }
           break;
@@ -335,7 +332,7 @@ void sendQueueCmd(void)
           {
             char buf[12];
             sprintf(buf, "S%d\n", speedGetPercent(1));
-            strcat(gcode,(const char*)buf);
+            strcat(infoCmd.queue[infoCmd.index_r].gcode,(const char*)buf);
             speedSetSendWaiting(1, false);
           }
           break;
@@ -343,7 +340,7 @@ void sendQueueCmd(void)
       break;
 
     case 'G':
-      cmd=strtol(&gcode[1],NULL,10);
+      cmd=strtol(&infoCmd.queue[infoCmd.index_r].gcode[1],NULL,10);
       switch(cmd)
       {
         case 0: //G0
@@ -400,7 +397,7 @@ void sendQueueCmd(void)
       break;
 
     case 'T':
-      cmd=strtol(&gcode[1], NULL, 10);
+      cmd=strtol(&infoCmd.queue[infoCmd.index_r].gcode[1], NULL, 10);
       heatSetCurrentToolNozzle((TOOL)(cmd + NOZZLE0));
       break;
   }
