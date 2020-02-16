@@ -186,7 +186,7 @@ void parseACK(void)
     }
     else if(ack_seen("B:"))		
     {
-      heatSetCurrentTemp(BED,ack_value()+0.5);
+      heatSetCurrentTemp(BED, ack_value()+0.5);
       heatSyncTargetTemp(BED, ack_second_value()+0.5);
       avoid_terminal = infoSettings.terminalACK;
       updateLastHeatCheckTime();
