@@ -18,13 +18,13 @@ GUI_RECT doubleBtnRect[] ={POPUP_RECT_DOUBLE_CONFIRM, POPUP_RECT_DOUBLE_CANCEL};
 
 
 WINDOW window = {
-  POPUP_RECT_WINDOW,       //����������
-  10,                      //�Ľ�Բ���İ뾶
-  3,                       //��ߵ��߿�
-  0x5D7B,                  //��ߺͱ������ı���ɫ
-  {MAGENTA, 0x5D7B, POPUP_TITLE_HEIGHT},   //������ ����ɫ/����ɫ/�߶�
-  {WHITE, BLACK, POPUP_TEXT_HEIGHT},    //�ı��� ����ɫ/����ɫ/�߶�
-  {WHITE, GRAY,  POPUP_BOTTOM_HEIGHT},  //�ײ� (����ɫ)/����ɫ/(�߶�)
+  POPUP_RECT_WINDOW,                      //rectangle position and size of popup window
+  10,                                     //Four-corner arc radius
+  3,                                      //Outer line width
+  0x5D7B,                                 //Outer and title bar background color
+  {MAGENTA, 0x5D7B, POPUP_TITLE_HEIGHT},  //Title bar font color / background color / height
+  {WHITE, BLACK, POPUP_TEXT_HEIGHT},      //Message area font color / background color / height
+  {WHITE, GRAY,  POPUP_BOTTOM_HEIGHT},    //Bottom (font color) / background color / (height)
 };
 
 static BUTTON *windowButton =  NULL;
