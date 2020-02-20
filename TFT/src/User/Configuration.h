@@ -24,6 +24,15 @@
 // Run Marlin Mode fullscreen. Not recommended for TFT24.
 //#define ST7920_FULLSCREEN
 
+/**
+ * CLEAN MODE SWITCHING SUPPORT
+ * Support for keeping UART(Serial communication) alive in Marlin Mode
+ * Gives the ability to connect Octoprint over UART to the TFT UART/serial 
+ * expansion port and have it work seamlessly no matter which mode the TFT is in. 
+ * Only for TFT24 V1.1, TFT35 V3.0 or TFT28 V3.0
+*/ 
+#define CLEAN_MODE_SWITCHING_SUPPORT  // Enable CLEAN MODE SWITCHING SUPPORT
+
 //===========================================================================
 //============================ TFT Mode Settings ============================
 //===========================================================================
@@ -143,10 +152,6 @@
   #define M27_REFRESH                3        // Time in sec for M27 command
   #define M27_WATCH_OTHER_SOURCES    true     // if true the polling on M27 report is always active. Case: SD print started not from TFT35
 #endif
-
-// Support for clean mode switching
-// Gives the ability to connect Octoprint over UART and have it work seamlessly no matter which mode the TFT is in.
-#define CLEAN_MODE_SWITCHING_SUPPORT
 
 /**
  * Home before power loss recovery
