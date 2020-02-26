@@ -22,7 +22,7 @@
 //#define ST7920_BANNER_TEXT "LCD12864 Simulator"
 
 // Run Marlin Mode fullscreen. Not recommended for TFT24.
-//#define ST7920_FULLSCREEN
+#define ST7920_FULLSCREEN
 
 /**
  * CLEAN MODE SWITCHING SUPPORT
@@ -31,7 +31,7 @@
  * expansion port and have it work seamlessly no matter which mode the TFT is in. 
  * Only for TFT24 V1.1, TFT35 V3.0 or TFT28 V3.0
 */ 
-//#define CLEAN_MODE_SWITCHING_SUPPORT  // Enable CLEAN MODE SWITCHING SUPPORT
+#define CLEAN_MODE_SWITCHING_SUPPORT  // Enable CLEAN MODE SWITCHING SUPPORT
 
 //===========================================================================
 //============================ TFT Mode Settings ============================
